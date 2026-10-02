@@ -1,0 +1,26 @@
+name: Extract Nononick backup
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract backup
+        run: |
+          set -e
+          mkdir -p site
+          tar -xzf "backup-9.17.2026_22-04-47_nononick.tar.gz" -C site
+          find site -maxdepth 2 -type f | head -100
+      - name: Commit extracted files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add site
+          git diff --cached --quiet || git commit -m "Extract Nononick backup"
+          git push
